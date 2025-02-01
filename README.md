@@ -17,7 +17,7 @@ This is my portfolio website where it took even the last two of my non-existent 
 ---
 
 ### 🚀 **About Me:**
-- 💻 **Software Engineer**  
+- 💻 **FrontEnd Developer**  
 - 🌱 **Lifelong Learner**  
 - 🚀 **Tech Enthusiast**  
 
