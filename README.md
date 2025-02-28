@@ -32,7 +32,7 @@ This is my portfolio website where it took even the last two of my non-existent 
 
 ### 📂 **Projects:**
 - [Nexus](https://the-inception-bros.github.io/nexus.github.io/)
-- [My Portfolio](https://alan-betty.github.io)  
+- [My Portfolio](https://alan-betty.github.io/Alan-Betty/)  
 - [The Inception Bros](https://alan-betty.github.io/The-Inception-Bros)  
 - [Favourite Places](https://webinar-alanpadayattilbetty.github.io/webinar-Alanpadayattilbetty-Mytraveldestinationadvancedwithlogin.github.io/)  
 - [Incredible India](https://webinar-alanpadayattilbetty.github.io/mindchampWebinar.github.io/)  
