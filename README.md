@@ -10,7 +10,7 @@
 ---
 
 Hi! I'm **Alan Betty**, a young student passionate about programming and technology.  
-I'm always ready to help anyone in need with all my knowledge. Feel free to reach out!
+I'm always ready to help anyone in need with all my knowledge. Feel free to reach out! 
 
 This is my portfolio website where it took even the last two of my non-existent brain cells 🤓.
 
