@@ -1,0 +1,26 @@
+{
+  "name": "alan-betty-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "gen:assets": "node scripts/generate-assets.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "lenis": "^1.3.11",
+    "next": "^15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@types/three": "^0.180.0",
+    "typescript": "^5.8.3"
+  }
+}

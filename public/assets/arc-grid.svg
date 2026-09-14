@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1080" fill="none">
+  <line x1="0" y1="540" x2="427.2" y2="-88.6" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="510.2" y2="-23.3" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="583.4" y2="52.9" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="645.3" y2="138.5" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="694.8" y2="231.9" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="730.8" y2="331.2" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="752.7" y2="434.6" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="760.0" y2="540.0" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="752.7" y2="645.4" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="730.8" y2="748.8" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="694.8" y2="848.1" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="645.3" y2="941.5" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="583.4" y2="1027.1" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <line x1="0" y1="540" x2="510.2" y2="1103.3" stroke="#F2EEE6" stroke-opacity="0.045" stroke-width="1"/>
+  <circle cx="0" cy="540" r="60" stroke="#F2EEE6" stroke-opacity="0.140" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="134" stroke="#F2EEE6" stroke-opacity="0.127" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="208" stroke="#F2EEE6" stroke-opacity="0.114" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="282" stroke="#F2EEE6" stroke-opacity="0.101" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="356" stroke="#F2EEE6" stroke-opacity="0.088" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="430" stroke="#F2EEE6" stroke-opacity="0.075" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="504" stroke="#F2EEE6" stroke-opacity="0.062" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="578" stroke="#F2EEE6" stroke-opacity="0.049" stroke-width="1" fill="none"/>
+  <circle cx="0" cy="540" r="652" stroke="#F2EEE6" stroke-opacity="0.036" stroke-width="1" fill="none"/>
+</svg>

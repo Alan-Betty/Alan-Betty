@@ -1,0 +1,225 @@
+/* ══════════════════════════════════════════════════════════════
+   UI — buttons, chips, tokens, kinetic type
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Buttons ───────────────────────────────────────────────── */
+
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--bone-100);
+  --btn-line: var(--line-strong);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.82rem 1.5rem;
+  border: 1px solid var(--btn-line);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  white-space: nowrap;
+  will-change: transform;
+  transition: color var(--dur-mid) var(--ease-swift), border-color var(--dur-mid) var(--ease-swift);
+}
+
+/* Fill wipes up from the bottom rather than fading — cheaper to
+   read at a glance and far less generic. */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fill, var(--signal));
+  transform: translateY(101%);
+  transition: transform var(--dur-mid) var(--ease-out-expo);
+}
+
+.btn:hover::before,
+.btn:focus-visible::before {
+  transform: translateY(0);
+}
+
+.btn span {
+  display: inline-block;
+  will-change: transform;
+}
+
+.btn--signal {
+  --btn-bg: var(--signal);
+  --btn-fg: var(--ink-900);
+  --btn-line: var(--signal);
+  --btn-fill: var(--bone-100);
+  font-weight: 700;
+}
+
+.btn--ghost {
+  --btn-fg: var(--bone-300);
+  --btn-fill: var(--bone-100);
+}
+
+.btn--ghost:hover,
+.btn--ghost:focus-visible {
+  color: var(--ink-900);
+  border-color: var(--bone-100);
+}
+
+.btn--big {
+  padding: clamp(1rem, 2.2vw, 1.5rem) clamp(1.6rem, 4vw, 3rem);
+  font-size: clamp(0.72rem, 1.5vw, 1rem);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  border-color: var(--line-strong);
+  --btn-fill: var(--signal);
+  font-family: var(--font-mono);
+}
+
+.btn--big:hover,
+.btn--big:focus-visible {
+  color: var(--ink-900);
+  border-color: var(--signal);
+}
+
+/* ── Chips ─────────────────────────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.26rem 0.72rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  font-size: 0.63rem;
+  letter-spacing: 0.04em;
+  color: var(--bone-400);
+  background: rgba(242, 238, 230, 0.02);
+  transition: color var(--dur-fast) var(--ease-swift), border-color var(--dur-fast) var(--ease-swift);
+}
+
+.chip:hover {
+  color: var(--bone-100);
+  border-color: var(--line-strong);
+}
+
+/* ── Physics tokens ────────────────────────────────────────── */
+
+.token-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* The physics wrapper sits between .stack__field and the groups, so the
+     group rhythm has to live here or it collapses. */
+  gap: clamp(2rem, 3.5vw, 2.75rem);
+}
+
+.token {
+  --token-glow: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.46rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--bone-300);
+  background: color-mix(in oklab, var(--ink-600) 78%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  user-select: none;
+  will-change: transform;
+  box-shadow: 0 0 calc(var(--token-glow) * 26px) rgba(216, 251, 79, calc(var(--token-glow) * 0.3));
+  border-color: color-mix(
+    in oklab,
+    var(--signal) calc(var(--token-glow) * 55%),
+    rgba(242, 238, 230, 0.1)
+  );
+  transition: color var(--dur-fast) var(--ease-swift);
+}
+
+.token[data-weight='core'] {
+  color: var(--bone-100);
+  font-weight: 500;
+  border-color: color-mix(
+    in oklab,
+    var(--signal) calc(28% + var(--token-glow) * 50%),
+    rgba(242, 238, 230, 0.1)
+  );
+  background: color-mix(in oklab, var(--signal) 5%, var(--ink-600) 80%);
+}
+
+.token[data-weight='lang'] {
+  color: var(--bone-200);
+  border-color: color-mix(
+    in oklab,
+    var(--azure) calc(22% + var(--token-glow) * 45%),
+    rgba(242, 238, 230, 0.1)
+  );
+}
+
+.token:hover {
+  color: var(--bone-100);
+}
+
+/* ── Kinetic type ──────────────────────────────────────────── */
+
+.kinetic {
+  display: block;
+}
+
+.kinetic__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.kinetic__mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* The clip box has to clear descenders AND the outer half of
+     -webkit-text-stroke, or outlined display type looks shredded. */
+  padding: 0.16em 0.07em 0.26em;
+  margin: -0.16em -0.07em -0.26em;
+}
+
+.kinetic__unit {
+  display: inline-block;
+  transform: translate3d(0, 132%, 0) rotate(3deg);
+  opacity: 0;
+  transition:
+    transform 1s var(--ease-out-expo),
+    opacity 0.7s var(--ease-swift);
+  transition-delay: var(--u, 0ms);
+  will-change: transform;
+}
+
+.kinetic__space {
+  display: inline-block;
+  width: 0.26em;
+}
+
+[data-reveal-text='in'] .kinetic__unit {
+  transform: none;
+  opacity: 1;
+}
+
+@media (scripting: none) {
+  .kinetic__unit {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kinetic__unit {
+    transform: none;
+    opacity: 1;
+  }
+}

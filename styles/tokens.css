@@ -1,0 +1,123 @@
+/* ══════════════════════════════════════════════════════════════
+   PHOSPHOR INK — design tokens
+   Violet-shifted black ground · bone type · acid signal
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Ground ──────────────────────────────────────────────── */
+  --void: #050409;
+  --ink-900: #060508;
+  --ink-800: #09070d;
+  --ink-700: #0d0b12;
+  --ink-600: #131018;
+  --ink-500: #1a1620;
+  --ink-400: #241f2c;
+  --ink-300: #322b3c;
+
+  /* ── Foreground ──────────────────────────────────────────── */
+  --bone-100: #f2eee6;
+  --bone-200: #e4dfd4;
+  --bone-300: #c5bfb3;
+  --bone-400: #8f8a80;
+  --bone-500: #67625b;
+  --bone-600: #454047;
+
+  /* ── Signal ──────────────────────────────────────────────── */
+  --signal: #d8fb4f;
+  --signal-dim: #9db839;
+  --signal-glow: rgba(216, 251, 79, 0.16);
+  --ember: #ff4f1f;
+  --ember-glow: rgba(255, 79, 31, 0.16);
+  --azure: #5f8bff;
+  --azure-glow: rgba(95, 139, 255, 0.16);
+  --plum: #b06cff;
+
+  /* ── Hairlines ───────────────────────────────────────────── */
+  --line-faint: rgba(242, 238, 230, 0.055);
+  --line: rgba(242, 238, 230, 0.1);
+  --line-strong: rgba(242, 238, 230, 0.2);
+
+  /* ── Type families ───────────────────────────────────────── */
+  --font-display: var(--f-display), 'Arial Black', sans-serif;
+  --font-serif: var(--f-serif), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--f-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Fluid type scale (min 360px → max 1600px) ───────────── */
+  --t-hero: clamp(3.6rem, 20vw, 16.5rem);
+  --t-mega: clamp(2.75rem, 8.5vw, 9rem);
+  --t-xxl: clamp(2.25rem, 5.6vw, 5.25rem);
+  --t-xl: clamp(1.75rem, 3.6vw, 3.25rem);
+  --t-lg: clamp(1.3rem, 2.2vw, 2rem);
+  --t-md: clamp(1.02rem, 1.15vw, 1.18rem);
+  --t-body: clamp(0.94rem, 0.95vw, 1.04rem);
+  --t-sm: clamp(0.8rem, 0.8vw, 0.87rem);
+  --t-xs: 0.72rem;
+  --t-hud: 0.635rem;
+
+  /* ── Rhythm ──────────────────────────────────────────────── */
+  --gutter: clamp(1.15rem, 4.2vw, 4.5rem);
+  --rail: clamp(2.6rem, 4vw, 3.75rem);
+  --sec-y: clamp(5.5rem, 12vh, 11rem);
+  --stack-1: 0.4rem;
+  --stack-2: 0.75rem;
+  --stack-3: 1.25rem;
+  --stack-4: 2rem;
+  --stack-5: 3.25rem;
+  --stack-6: 5rem;
+
+  /* ── Motion ──────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-swift: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 180ms;
+  --dur-mid: 420ms;
+  --dur-slow: 900ms;
+  --dur-epic: 1400ms;
+
+  /* ── Layers ──────────────────────────────────────────────── */
+  --z-canvas: 0;
+  --z-content: 10;
+  --z-rail: 60;
+  --z-nav: 80;
+  --z-grain: 90;
+  --z-menu: 100;
+  --z-cursor: 120;
+  --z-boot: 200;
+
+  /* ── Engraved display fills ──────────────────────────────────
+     Bricolage Grotesque ships overlapping contours, so
+     -webkit-text-stroke draws every internal edge of a capital and
+     the letterform reads as broken. A hatch clipped to the glyph
+     gives the same ghosted weight with none of the artefacts.
+     The period is em-relative so stripe density stays constant across
+     the type scale, with a pixel floor so small headings do not alias
+     into mud. */
+  --hatch-line: max(1px, 0.011em);
+  --hatch-gap: max(2.6px, 0.028em);
+  --hatch-bone: repeating-linear-gradient(
+    180deg,
+    rgba(242, 238, 230, 0.7) 0,
+    rgba(242, 238, 230, 0.7) var(--hatch-line),
+    transparent var(--hatch-line),
+    transparent var(--hatch-gap)
+  );
+  --hatch-signal: repeating-linear-gradient(
+    180deg,
+    rgba(216, 251, 79, 0.95) 0,
+    rgba(216, 251, 79, 0.95) var(--hatch-line),
+    transparent var(--hatch-line),
+    transparent var(--hatch-gap)
+  );
+
+  /* ── Radii ───────────────────────────────────────────────── */
+  --r-xs: 3px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  color-scheme: dark;
+}
+
+/* The site is a committed dark object. Light mode is not a mode. */

@@ -1,91 +1,220 @@
-# Alan Betty
+# Alan Betty — Portfolio
 
-[![YouTube Channel Views](https://img.shields.io/youtube/channel/views/UCXyMznWPmtsBvRmf6JSlr4w?style=social&label=YouTube)](https://youtube.com/@alanbetty)
-[![Instagram Follow](https://img.shields.io/badge/Instagram-Follow-%23000?style=social&logo=Instagram)](https://instagram.com/alan__betty)
-[![X Follow](https://img.shields.io/badge/X-Follow-%23000?style=social&logo=x)](https://x.com/AlanPBetty)
-[![CodePen Follow](https://img.shields.io/badge/CodePen-Follow-%23000?style=social&logo=codepen)](https://codepen.io/Alan-Betty)
-[![Discord Follow](https://img.shields.io/badge/Discord-Follow-%23000?style=social&logo=discord)](https://discord.com/users/1229633538362703882)
-[![JsFiddle Follow](https://img.shields.io/badge/JsFiddle-Follow-%23000?style=social&logo=JSfiddle)](https://jsfiddle.net/user/AlanBetty/fiddles/)
+A bespoke portfolio and interactive display site for Alan Betty: frontend developer,
+UI/UX designer and browser engineer from Kerala, India.
 
----
+No component library, no CSS framework, no template. Every surface is hand-built.
 
-Hi! I'm **Alan Betty**, a young student passionate about programming and technology.  
-I'm always ready to help anyone in need with all my knowledge. Feel free to reach out!
-
-This is my portfolio website where it took even the last two of my non-existent brain cells 🤓.
+```bash
+npm install
+npm run dev          # http://localhost:3000
+npm run build        # production build
+npm run gen:assets   # regenerate procedural textures into public/assets
+```
 
 ---
 
-### 🚀 **About Me:**
-- 💻 **FrontEnd Developer**
-- 🌱 **Lifelong Learner**
-- 🚀 **Tech Enthusiast**
+## Design system — "Phosphor Ink"
+
+A committed dark object. There is no light mode, and that is a decision rather than
+an omission: the whole palette, the WebGL ground and the grain are tuned to one
+register.
+
+| Role | Token | Value |
+| --- | --- | --- |
+| Ground | `--ink-900 … --ink-300` | violet-shifted blacks, `#060508` up |
+| Type | `--bone-100 … --bone-600` | warm bone, `#f2eee6` down |
+| Signal | `--signal` | `#d8fb4f` acid — one accent, used sparingly |
+| Heat | `--ember` | `#ff4f1f` — accretion disk, in-progress state |
+| Depth | `--azure` | `#5f8bff` — WebGL filaments, secondary tags |
+
+**Type.** Three families, each with one job.
+
+- **Bricolage Grotesque** (variable, `opsz` + `wdth` axes) — display. The hero name
+  reads pointer distance per glyph and responds on the weight and width axes, so the
+  typography *is* the interaction rather than carrying a decoration on top of it.
+- **Instrument Serif Italic** — the human voice: pull quotes, project one-liners.
+- **JetBrains Mono** — every label, metric and piece of chrome. The site's HUD.
+
+**Engraved display type.** Bricolage ships glyphs with overlapping contours, so
+`-webkit-text-stroke` draws every internal edge and capitals render as broken boxes.
+Ghosted headings therefore use a hatch clipped to the glyph
+(`--hatch-bone` / `--hatch-signal` + `background-clip: text`). The stripe period is
+`em`-relative with a pixel floor, so density stays constant across the type scale.
+The hatch is applied to the painted leaf — the glyph or kinetic unit — because a
+transformed descendant paints in its own context and would otherwise lose the clip.
 
 ---
 
-### 🌐 **Languages I Know**
+## Motion architecture
 
-- **Programming Languages:** JavaScript, Python, C++, PHP
-- **Front-End:** HTML, CSS, Javscript
-- **Other:** Arduino, Firebase, Shell,
-- **Frameworks & Libraries:** React.js, Node.js
+Everything animated shares **one `requestAnimationFrame` loop** (`lib/motion.ts`).
+Components subscribe with `onTick(fn)` instead of starting their own loops, which
+keeps the frame budget predictable and means scroll, pointer and physics all read
+from the same instant.
 
----
+- `scrollState` — position, progress, velocity and a smoothed `energy` value, written
+  once per frame by the Lenis provider and read by everyone else. No component binds
+  its own scroll listener.
+- `pointer` — raw, smoothed and normalised pointer coordinates plus speed, bound once.
+- `damp(a, b, speed, dt)` — frame-rate independent easing. Used everywhere a value
+  chases a target, so behaviour is identical at 60Hz and 120Hz.
 
-### 🏆 **GitHub Trophies**
+Reveals are declarative: any element with `data-reveal` is picked up by a single
+`IntersectionObserver`, and stagger is expressed as `--reveal-delay` in the style
+attribute. No timing logic in JavaScript.
 
-[![Alan's github trophies](https://github-profile-trophy.vercel.app/?username=Alan-Betty&theme=gruvbox&no-frame=true&margin-w=15)](https://github.com/ryo-ma/github-profile-trophy)
-
----
-
-### 🧑‍💻 **Tech Stack**
-![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![Markdown](https://img.shields.io/badge/markdown-%23000000.svg?style=for-the-badge&logo=markdown&logoColor=white) ![PowerShell](https://img.shields.io/badge/PowerShell-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Windows Terminal](https://img.shields.io/badge/Windows%20Terminal-%234D4D4D.svg?style=for-the-badge&logo=windows-terminal&logoColor=white) ![Azure](https://img.shields.io/badge/azure-%230072C6.svg?style=for-the-badge&logo=microsoftazure&logoColor=white) ![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white) ![Google Cloud](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white) ![Electron.js](https://img.shields.io/badge/Electron-191970?style=for-the-badge&logo=Electron&logoColor=white) ![Expo](https://img.shields.io/badge/expo-1C1E24?style=for-the-badge&logo=expo&logoColor=#D04A37) ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white) ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white) ![Qt](https://img.shields.io/badge/Qt-%23217346.svg?style=for-the-badge&logo=Qt&logoColor=white) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![React Query](https://img.shields.io/badge/-React%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white) ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white) ![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-%23EC5990.svg?style=for-the-badge&logo=reacthookform&logoColor=white) ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) ![Vue.js](https://img.shields.io/badge/vue.js-%2335495e.svg?style=for-the-badge&logo=vuedotjs&logoColor=%234FC08D) ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34) ![Adobe](https://img.shields.io/badge/adobe-%23FF0000.svg?style=for-the-badge&logo=adobe&logoColor=white) ![Adobe Creative Cloud](https://img.shields.io/badge/Adobe%20Creative%20Cloud-DA1F26.svg?style=for-the-badge&logo=Adobe%20Creative%20Cloud&logoColor=white) ![Adobe Illustrator](https://img.shields.io/badge/adobe%20illustrator-%23FF9A00.svg?style=for-the-badge&logo=adobe%20illustrator&logoColor=white) ![Adobe Photoshop](https://img.shields.io/badge/adobe%20photoshop-%2331A8FF.svg?style=for-the-badge&logo=adobe%20photoshop&logoColor=white) ![Adobe Premiere Pro](https://img.shields.io/badge/Adobe%20Premiere%20Pro-9999FF.svg?style=for-the-badge&logo=Adobe%20Premiere%20Pro&logoColor=white) ![Canva](https://img.shields.io/badge/Canva-%2300C4CC.svg?style=for-the-badge&logo=Canva&logoColor=white) ![Blender](https://img.shields.io/badge/blender-%23F5792A.svg?style=for-the-badge&logo=blender&logoColor=white) ![Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white) ![Krita](https://img.shields.io/badge/Krita-203759?style=for-the-badge&logo=krita&logoColor=EEF37B) ![Arduino](https://img.shields.io/badge/-Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white) ![Meta](https://img.shields.io/badge/Meta-%230467DF.svg?style=for-the-badge&logo=Meta&logoColor=white) ![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white) ![Prettier](https://img.shields.io/badge/prettier-%23F7B93E.svg?style=for-the-badge&logo=prettier&logoColor=black) ![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=for-the-badge&logo=Raspberry-Pi)
-
----
-
-### 📂 **Projects:**
-- [Nexus](https://the-inception-bros.github.io/nexus.github.io/)
-- [My Portfolio](https://alan-betty.github.io/Alan-Betty/)
-- [The Inception Bros](https://alan-betty.github.io/The-Inception-Bros)
-- [Favourite Places](https://webinar-alanpadayattilbetty.github.io/webinar-Alanpadayattilbetty-Mytraveldestinationadvancedwithlogin.github.io/)
-- [Incredible India](https://webinar-alanpadayattilbetty.github.io/mindchampWebinar.github.io/)
+`prefers-reduced-motion` is honoured throughout — Lenis drops to near-native
+scrolling, the horizontal rail unpins, physics and the custom cursor switch off, and
+the shader renders a fixed frame.
 
 ---
 
-### 📊 **My GitHub Stats:**
+## The pieces
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=Alan-Betty&show_icons=true&count_private=true&theme=dark)
-![Hackatime](https://github-readme-stats.hackclub.dev/api/wakatime?username=21557&api_domain=hackatime.hackclub.com&&custom_title=Hackatime+Stats&layout=compact&cache_seconds=0&langs_count=8&theme=nightowl)
-![Most Used Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=Alan-Betty&layout=compact&theme=dark)
-![GitHub Streak](https://streak-stats.demolab.com/?user=Alan-Betty&theme=github-dark)
-
-
-![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=36BCF7&width=435&lines=You+Like+It?)
-
----
-
-### 📈 **Top Contributed Repo**
-
-![](https://github-contributor-stats.vercel.app/api?username=Alan-Betty&limit=5&theme=dark&combine_all_yearly_contributions=true)
+| Surface | What it is |
+| --- | --- |
+| `components/canvas/Cosmos.tsx` | The persistent ground: a lensed black hole. See below. Three.js is dynamically imported so it never blocks first paint. |
+| `components/chrome/EventHorizon.tsx` | The easter egg. See below. |
+| `components/canvas/TokenField.tsx` | Soft-body physics over real DOM. Stack tokens keep their normal flex-wrap layout and only `transform` is written, so text stays selectable and focusable. Cursor repulsion, springs home, pairwise separation. |
+| `components/sections/Flagship.tsx` | Pyraxis presented as a working browser window — real tabs, an omnibox that retypes on navigation, cursor-driven tilt. He built a browser, so the case study is one. |
+| `components/sections/Work.tsx` | Horizontal rail. The section is made tall enough that one page-scroll equals one track-pixel, then pinned with `position: sticky` and driven from the shared ticker so it stays locked to Lenis's interpolated position. Unpins below 900px — horizontal scroll-jacking on touch is a usability tax. |
+| `components/chrome/Cursor.tsx` | Two-part cursor: a hard dot tracking 1:1 and a lagging ring that stretches along the direction of travel and carries state. Any element drives it with `data-cursor` / `data-cursor-label`. |
+| `components/ui/Kinetic.tsx` | Masked type reveal, split on the server so there is no flash of unsplit text and no layout shift. The real string stays in `aria-label`. |
 
 ---
 
-### 💬 **Random Dev Quotes**
+## The cosmos
 
-![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=dark)
+The background is a Schwarzschild black hole, ray-traced. Each pixel integrates a
+null geodesic backwards from the camera rather than faking the optics in screen
+space. Working in units of M = 1 (so Rs = 2), the photon path obeys
+
+```
+d²r/dλ² = -3·h²·r / |r|⁵        h = |r × v|
+```
+
+which follows from the Binet equation for light, `u'' + u = 3Mu²`. (The `-3/2`
+coefficient that circulates in shader demos is written in units where Rs = 1;
+using it with M = 1 constants halves the shadow and detaches it from the ISCO.)
+
+Everything the eye recognises then falls out of the integration instead of being
+drawn on:
+
+| Feature | Where it comes from |
+| --- | --- |
+| The shadow | Rays with `b < 3√3 M` are captured. It is ~2.6 Rs across — much larger than the horizon, which is the detail most fakes get wrong |
+| Photon ring | Rays just outside that impact parameter wind around repeatedly and pick the disk up several times |
+| Far side over the top | Those rays genuinely bend around the hole, so the underside and far side arrive above and below the shadow |
+| Einstein arcs | The escaped ray direction samples the starfield, so whatever bent the ray bends the sky too |
+
+Shading is relativistic. Doppler and gravitational shift combine into one factor
+`g`; observed intensity goes as `g⁴` and the observed colour is the emitted
+blackbody shifted by `g`. The resulting asymmetry — one limb blue-white and
+fierce, the other dim and red — is what actually reads as "real". Emission
+follows a Shakura–Sunyaev thin disk with a zero-torque inner boundary, so it
+fades out at the ISCO instead of stopping at a hard edge.
+
+Two details that matter more than they sound:
+
+- **The disk is tone mapped on luminance, not per channel.** Per-channel Reinhard
+  compresses the largest channel hardest, bleaching saturated colour to grey
+  exactly where the disk is most interesting.
+- **Turbulence is advected on a cyclic flow map.** Advecting noise by `ωt`
+  directly winds it up without bound — `∂φ/∂r` grows linearly with elapsed time
+  until the disk aliases into concentric wires. Real plasma is continuously
+  restirred, so two half-cycle-offset layers cross-fade, each advected for only
+  half a cycle and each fading to nothing exactly when it resets.
+
+### The starfield
+
+Cells live on a cube parameterisation — no pole pinch, roughly equal area
+everywhere. Magnitudes follow a steep power law, because a sky of equal dots
+reads as noise while a few bright ones read as sky. Each star is a bright core
+plus a wide faint halo (the shape of a real PSF), colour tied to magnitude since
+hot stars are both rarer and brighter, and only the top few percent earn
+diffraction spikes. A Milky Way band raises density near the galactic plane and
+dust lanes cut into it.
+
+### The swarm
+
+On top of the trace sits an N-body layer: 900 stars integrated in the same world
+coordinates, launched sub-circular on inclined orbits so they decay into the disk
+plane. They brighten and blue-shift as they fall, stretch into tidal streams, are
+occluded when they pass behind the shadow, and respawn at the rim once consumed.
+They share the camera basis with the shader, so the two always agree about where
+things are.
+
+The hole has **mass**. It sits in the right-hand margin, drifts with scroll, and
+leans toward the cursor — heavily damped, so dragging it feels like moving
+something enormous rather than sliding a sprite. It dims once the reader is past
+the hero: the spectacle belongs to the first screen.
+
+Cost is managed rather than hoped for. Rays whose impact parameter never reaches
+the strong-field region skip integration entirely and sample the sky directly —
+about four fifths of the screen. The layer caps its own pixel ratio and, if
+frames run long, lowers its own resolution instead of dropping the effect.
+
+### The collapse
+
+At the very end of the footer colophon there is a small dark disc. Clicking it
+lets the hole eat the page.
+
+Every word currently on screen is measured with a `Range`, lifted into a fixed
+overlay as an absolutely-positioned span carrying its own copied typography,
+and handed to the same gravity the stars obey. Words spiral in, rotate to
+align with the radius, and stretch along it as tidal forces win. The disk
+flares and the horizon swells in proportion to how much has been consumed.
+
+Only the visible viewport is harvested — you cannot eat what you cannot see —
+which keeps the word count bounded and the effect at full frame rate. The rest
+of the document hides behind it.
+
+Nothing is persisted. A reload brings the page back, and the aftermath offers
+a button that does exactly that. Deadlines inside the simulation are measured
+against the wall clock rather than simulated time, because the shared ticker
+clamps `dt`: on a slow device the collapse must still finish on schedule.
+Under `prefers-reduced-motion` the physics is skipped entirely.
 
 ---
 
-### 🙋‍♂️ **A Little About Me:**
-- 🔭 I’m currently working on a few company websites.
-- 🌱 I’m currently learning Back-End development.
-- 👯 I’m looking to collaborate on Python and PyGame projects.
-- 🤔 I’m happy to help with anything I know.
-- 💬 Ask me about anything, and I'll share what I can!
-- 📫 Reach me at: **padayattilbettyalan@gmail.com**
-- 😄 Pronouns: **He/Him**
-- ⚡ Fun fact: I'm eligible for a place in the India Book of Records.
+## Assets
+
+`scripts/generate-assets.mjs` writes every texture in `public/assets` procedurally —
+seeded, so re-running produces identical output. PNGs are encoded by hand (IHDR /
+IDAT / IEND + CRC32 + zlib) with no dependencies outside Node's standard library.
+
+- `grain.png` — triangular-distribution film grain
+- `topo-field.png` — fBm contour field, elevation-tinted
+- `halftone.png` — dot-ramp
+- `mark.svg`, `arc-grid.svg`, `layer-stack.svg` — vector marks
+
+`pyraxis-shot.webp` is a real screenshot of Pyraxis Browser.
 
 ---
 
-Thanks for stopping by! 😊
+## Content
+
+All copy lives in `lib/data.ts` — one file, no strings scattered through components.
+Edit there and the whole site follows.
+
+## Structure
+
+```
+app/          layout, page, providers, 404
+components/
+  canvas/     WebGL ground, DOM physics
+  chrome/     nav, rail, cursor, boot
+  sections/   hero, ticker, flagship, work, stack, about, contact, footer
+  ui/         magnetic, kinetic
+lib/          data, motion primitives, scroll provider, reveal observer
+styles/       tokens, base, chrome, ui, sections
+scripts/      procedural asset generator
+```
+
+## Browser support
+
+Modern evergreen browsers. `color-mix()`, `background-clip: text`, `aspect-ratio`
+and `100svh` are used without fallbacks other than where noted. If WebGL is
+unavailable the ground falls back to a layered CSS gradient and nothing else
+changes.
