@@ -128,6 +128,8 @@ function harvest(overlay: HTMLElement): Word[] {
         span.style.letterSpacing = cs.letterSpacing;
         span.style.textTransform = cs.textTransform;
         span.style.lineHeight = `${r.height}px`;
+        // The word is drawn out from the end nearest the hole, not its middle
+        span.style.transformOrigin = '100% 50%';
         if (cs.fontVariationSettings && cs.fontVariationSettings !== 'normal') {
           span.style.fontVariationSettings = cs.fontVariationSettings;
         }
@@ -265,17 +267,23 @@ export default function EventHorizon() {
         w.x += w.vx * step;
         w.y += w.vy * step;
 
-        // Tidal stretching: align with the radius and draw out along it
+        /* Spaghettification. The tidal force pulling the near end of a word
+           harder than the far end goes as 1/r³, so the draw-out is steep
+           rather than linear, and the transverse squeeze is whatever keeps
+           the area roughly constant — the word is being drawn out, not
+           enlarged. The origin sits on the leading edge (+x after the
+           rotation points at the hole), so a word streams away from the end
+           that is falling first instead of stretching about its middle. */
         const ang = (Math.atan2(dy, dx) * 180) / Math.PI;
-        const closeness = clamp(1 - r / 900);
-        const stretch = 1 + closeness * closeness * 5.5;
-        const squeeze = 1 - closeness * 0.72;
+        const closeness = clamp(1 - r / 1100);
+        const stretch = 1 + Math.pow(closeness, 2.3) * 17;
+        const squeeze = Math.max(0.05, 1 / Math.sqrt(stretch));
         const fade = clamp((r - eaten) / 260);
 
         w.el.style.opacity = String(fade);
         w.el.style.transform =
           `translate3d(${(w.x - w.hx).toFixed(1)}px, ${(w.y - w.hy).toFixed(1)}px, 0) ` +
-          `rotate(${ang.toFixed(1)}deg) scale(${stretch.toFixed(2)}, ${squeeze.toFixed(2)})`;
+          `rotate(${ang.toFixed(1)}deg) scale(${stretch.toFixed(2)}, ${squeeze.toFixed(3)})`;
       }
 
       const progress = 1 - alive / total;
@@ -368,6 +376,10 @@ export default function EventHorizon() {
       w.dead = false;
       // Debris does not arrive in one wave
       w.delay = Math.random() * 0.2;
+      /* Back to the centre: the motion blur below is a rotate/scale/rotate
+         that has to collapse to the identity when the word comes to rest,
+         and it only lands on its own slot if it scales about its middle. */
+      w.el.style.transformOrigin = '50% 50%';
       w.el.style.opacity = '0';
       w.el.style.transform =
         `translate3d(${(w.x - w.hx).toFixed(1)}px, ${(w.y - w.hy).toFixed(1)}px, 0) scale(0.4)`;

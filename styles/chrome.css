@@ -106,17 +106,25 @@
   opacity: 0;
 }
 
+/* The ring is laid out at the largest size it will ever be drawn and every
+   state scales it DOWN. `will-change` promotes it to its own layer, which
+   the compositor rasterises once and then reuses: scaling that layer past
+   1 resamples a bitmap and the edge goes soft, which is why the filled
+   state used to arrive blurred. Staying at or under 1 — stretch included —
+   means the raster is only ever minified, and the edge stays hard.
+   The border is pre-multiplied to match: it scales with everything else. */
 .cursor-ring {
   position: fixed;
   top: 0;
   left: 0;
-  width: 42px;
-  height: 42px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  border: 1px solid rgba(216, 251, 79, 0.42);
+  border: 2.4px solid rgba(216, 251, 79, 0.42);
   display: grid;
   place-items: center;
   will-change: transform;
+  backface-visibility: hidden;
   opacity: 0;
   transition:
     background-color var(--dur-fast) var(--ease-swift),
@@ -422,6 +430,14 @@
   }
 }
 
+/* The desktop button is 46px tall, which is most of a phone's nav bar. */
+@media (max-width: 899px) {
+  .nav .nav__cta {
+    padding: 0.6rem 1.05rem;
+    font-size: 0.64rem;
+  }
+}
+
 /* Burger */
 .nav__burger {
   position: relative;
@@ -543,6 +559,11 @@
   padding-top: 1.25rem;
 }
 
+.menu__foot a {
+  /* An email address has nowhere to break on a 320px screen unless told */
+  overflow-wrap: anywhere;
+}
+
 .menu__foot a:hover {
   color: var(--signal);
 }
@@ -630,57 +651,109 @@
    EASTER EGG — the collapse
    ══════════════════════════════════════════════════════════════ */
 
-/* Trigger: a small dark disc at the end of the colophon. Present, but
-   it takes a second look to notice it is a control. */
+/* Trigger: a labelled pill at the end of the colophon. It is still the
+   quietest control on the page, but the label and the accreting core say
+   plainly that it is a control — the old bare disc did not. */
 .collapse-trigger {
   position: relative;
-  display: inline-grid;
-  place-items: center;
-  width: 14px;
-  height: 14px;
-  margin-left: 0.6rem;
-  vertical-align: -2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.7rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.5rem;
+  min-height: 24px;
+  vertical-align: middle;
   cursor: pointer;
-  opacity: 0.5;
-  transition: opacity var(--dur-mid) var(--ease-swift);
+  border: 1px solid rgba(255, 106, 32, 0.28);
+  border-radius: var(--r-pill);
+  background: rgba(255, 106, 32, 0.05);
+  transition:
+    border-color var(--dur-mid) var(--ease-swift),
+    background-color var(--dur-mid) var(--ease-swift);
+}
+
+/* A comfortable thumb target once there is no pointer to be precise with */
+@media (hover: none) {
+  .collapse-trigger {
+    min-height: 34px;
+    padding-inline: 0.8rem 0.9rem;
+  }
 }
 
 .collapse-trigger:hover,
 .collapse-trigger:focus-visible {
-  opacity: 1;
+  border-color: rgba(255, 140, 60, 0.6);
+  background: rgba(255, 106, 32, 0.1);
+}
+
+.collapse-trigger__orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .collapse-trigger__core {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #000;
-  box-shadow: 0 0 0 1px rgba(242, 238, 230, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(255, 140, 60, 0.55),
+    0 0 10px rgba(255, 106, 32, 0.4);
   transition: box-shadow var(--dur-mid) var(--ease-swift);
 }
 
+/* Two rings falling in on a stagger: the thing is visibly eating, which is
+   the whole hint about what pressing it does. */
 .collapse-trigger__ring {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1px solid rgba(255, 106, 32, 0.18);
-  transform: scale(0.7);
-  opacity: 0;
-  transition:
-    transform var(--dur-mid) var(--ease-spring),
-    opacity var(--dur-mid) var(--ease-swift);
+  border: 1px solid rgba(255, 106, 32, 0.55);
+  animation: accrete 2.8s var(--ease-in-out-quint) infinite;
 }
 
-.collapse-trigger:hover .collapse-trigger__ring,
-.collapse-trigger:focus-visible .collapse-trigger__ring {
-  transform: scale(1);
-  opacity: 1;
+.collapse-trigger__ring--late {
+  animation-delay: 1.4s;
+}
+
+@keyframes accrete {
+  0% { transform: scale(1.45); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: scale(0.42); opacity: 0; }
+}
+
+.collapse-trigger__label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 140, 60, 0.85);
+  white-space: nowrap;
+  transition: color var(--dur-mid) var(--ease-swift);
+}
+
+.collapse-trigger:hover .collapse-trigger__label,
+.collapse-trigger:focus-visible .collapse-trigger__label {
+  color: #ff8c3c;
 }
 
 .collapse-trigger:hover .collapse-trigger__core {
   box-shadow:
-    0 0 0 1px rgba(255, 140, 60, 0.75),
-    0 0 14px rgba(255, 106, 32, 0.55);
+    0 0 0 1px rgba(255, 170, 110, 0.9),
+    0 0 16px rgba(255, 106, 32, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapse-trigger__ring {
+    animation: none;
+    opacity: 0.45;
+    transform: scale(1);
+  }
 }
 
 /* While the page is being eaten it must not scroll, and the real

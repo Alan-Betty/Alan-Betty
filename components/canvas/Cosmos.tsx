@@ -94,6 +94,23 @@ const FRAG = /* glsl */ `
     return v;
   }
 
+  /* The disk is integrated over a slab rather than sampled once per
+     crossing, so a ray can take two or three samples where it used to take
+     one. The disk's high-frequency layer drops an octave to pay for that;
+     the base layer keeps all four, because that is where the filaments the
+     eye actually reads come from. */
+  float fbm3(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    mat2 m = mat2(1.62, 1.18, -1.18, 1.62);
+    for (int i = 0; i < 3; i++) {
+      v += a * vnoise(p);
+      p = m * p;
+      a *= 0.5;
+    }
+    return v;
+  }
+
   /* ── blackbody ───────────────────────────────────────────── */
   /* t is a normalised temperature; the ramp walks the Planckian
      locus from a dull ember through white to the blue-white of a
@@ -195,9 +212,49 @@ const FRAG = /* glsl */ `
     return col;
   }
 
-  /* ══ ACCRETION DISK ══════════════════════════════════════════ */
+  /* ══ ACCRETION DISK ══════════════════════════════════════════
 
-  vec3 diskEmission(vec3 hp, float rd, vec3 kObs) {
+     The disk has thickness. A zero-height sheet is sampled exactly once
+     per sign change of y, which means a ray skimming the plane collects
+     the same energy as one punching straight through it, and the rays
+     that approach the plane without ever crossing collect nothing at all.
+     Those three cases meet along the line where the disk is seen edge-on,
+     and the mismatch draws a hard seam clean across the frame.
+
+     Integrating a slab removes the discontinuity because nothing is
+     counted per-crossing any more: every step contributes exactly the
+     length of its own path through the slab, which goes to zero smoothly
+     at the edges instead of switching on. It is also simply what a real
+     disk is — hydrostatic equilibrium gives a Gaussian vertical profile
+     with a scale height that flares outward. */
+
+  /** Slab half-height at radius rd, in units of M. Thin: the slab exists
+      to make the disk continuous, not to turn it into fog. A ray that
+      spends a long path inside it averages the filaments away, and the
+      filaments are the texture the disk is made of. */
+  float diskH(float rd) {
+    return 0.26 + rd * 0.02;
+  }
+
+  /* Emission is per unit length now, so it is normalised by the slab
+     height inside diskEmission and scaled back here by roughly the path a
+     crossing takes — 2H / sin(incl) ≈ 6.4H. Tuned against the previous
+     build's mean frame luminance. */
+  const float EMIT = 0.26;
+
+  /** Radial envelope. Cheap, and it gates the expensive noise below. */
+  float diskEnv(float rd) {
+    return smoothstep(DISK_IN, DISK_IN * 1.22, rd) *
+           (1.0 - smoothstep(DISK_OUT * 0.52, DISK_OUT, rd));
+  }
+
+  /** kappa comes back as absorption per unit length along the ray. */
+  vec3 diskEmission(vec3 hp, float rd, vec3 kObs, out float kappa) {
+    kappa = 0.0;
+
+    float env = diskEnv(rd);
+    if (env < 0.004) return vec3(0.0);
+
     float phi = atan(hp.z, hp.x);
 
     // Keplerian rotation, and the orbital speed a local static
@@ -234,18 +291,35 @@ const FRAG = /* glsl */ `
     float a2 = phi + f2 * CYCLE * omega * 16.0;
 
     float nA = fbm(vec2(a1 * 1.15, rd * 0.9)) * 0.58
-             + fbm(vec2(a1 * 3.2 + 5.0, rd * 2.7)) * 0.42;
+             + fbm3(vec2(a1 * 3.2 + 5.0, rd * 2.7)) * 0.42;
     float nB = fbm(vec2(a2 * 1.15 + 41.0, rd * 0.9 + 17.0)) * 0.58
-             + fbm(vec2(a2 * 3.2 + 63.0, rd * 2.7 + 29.0)) * 0.42;
+             + fbm3(vec2(a2 * 3.2 + 63.0, rd * 2.7 + 29.0)) * 0.42;
 
+    /* The filaments are the disk's whole texture, so the contrast curve is
+       kept where it was — the slab integration already softens it slightly
+       by averaging along the ray. */
     float dens = smoothstep(0.2, 0.86, mix(nB, nA, wA));
 
-    float env = smoothstep(DISK_IN, DISK_IN * 1.22, rd) *
-                (1.0 - smoothstep(DISK_OUT * 0.52, DISK_OUT, rd));
+    /* Vertical profile. The midplane is dense and the atmosphere above it
+       thins out — which is also what stops the slab reading as a plate. */
+    float hh = diskH(rd);
+    float z = hp.y / hh;
+    float vert = exp(-z * z * 1.3);
+
+    /* Per unit length, so the column depth through the slab does not grow
+       with radius. Without this the disk gets brighter outward simply
+       because the slab is thicker there, which inverts the radial profile
+       the g^4 law and the Shakura-Sunyaev temperature are drawing. */
+    float body = env * dens * vert / hh;
 
     // Observed intensity follows the g^4 beaming law
     float g2 = g * g;
-    float inten = g2 * g2 * tEmit * env * dens * (1.0 + uFeed * 3.2);
+    float inten = g2 * g2 * tEmit * body * (1.0 + uFeed * 3.2);
+
+    /* Opacity tracks the same material. Tuned so one ordinary crossing
+       leaves roughly the transmission the thin-sheet version assumed,
+       which keeps the far side properly shaded behind the near side. */
+    kappa = body * 0.27;
 
     return blackbody(clamp(tEmit * g * 1.15, 0.0, 1.35)) * inten;
   }
@@ -303,17 +377,40 @@ const FRAG = /* glsl */ `
         vel += acc * dt;
         pos += vel * dt;
 
-        // Disk crossing: sign change of y, position found by lerp
-        if (p0.y * pos.y < 0.0) {
-          float t = p0.y / (p0.y - pos.y);
-          vec3 hp = mix(p0, pos, t);
-          float rd = length(hp.xz);
-          if (rd > DISK_IN && rd < DISK_OUT) {
-            // The photon runs from the disk to us: opposite our march
-            col += trans * diskEmission(hp, rd, -normalize(vel));
-            // Optically thick enough to shade what lies behind it
-            trans *= 0.3;
-            if (trans < 0.02) break;
+        /* Slab traversal. Over one step the path is straight, so the span
+           of it lying inside |y| < H solves in closed form. Weighting the
+           sample by that span is what makes the disk continuous: a ray
+           that grazes the slab and one that drives through it each get
+           what their own geometry is worth, and everything in between
+           varies smoothly rather than snapping between cases. */
+        vec3 seg = pos - p0;
+        float rMid = length((p0.xz + pos.xz) * 0.5);
+
+        if (rMid > DISK_IN * 0.8 && rMid < DISK_OUT * 1.1) {
+          float hh = diskH(rMid);
+          float dy = seg.y;
+          float tLo = 0.0;
+          float tHi = abs(p0.y) < hh ? 1.0 : -1.0;
+
+          if (abs(dy) > 1e-5) {
+            float ta = (-hh - p0.y) / dy;
+            float tb = (hh - p0.y) / dy;
+            tLo = max(0.0, min(ta, tb));
+            tHi = min(1.0, max(ta, tb));
+          }
+
+          if (tHi > tLo) {
+            vec3 hp = p0 + seg * (0.5 * (tLo + tHi));
+            float rd = length(hp.xz);
+            if (rd > DISK_IN && rd < DISK_OUT) {
+              float span = length(seg) * (tHi - tLo);
+              float kappa;
+              // The photon runs from the disk to us: opposite our march
+              vec3 em = diskEmission(hp, rd, -normalize(vel), kappa);
+              col += trans * em * span * EMIT;
+              trans *= exp(-kappa * span);
+              if (trans < 0.02) break;
+            }
           }
         }
       }
@@ -516,8 +613,10 @@ export default function Cosmos() {
       }
 
       const reduced = prefersReducedMotion();
-      // Ray-marched: a softer raster is the right trade for a background
-      let quality = Math.min(window.devicePixelRatio || 1, 1.0);
+      /* Ray-marched: a softer raster is the right trade for a background.
+         Phones start lower still — the adaptive ramp below would get there
+         anyway, and it should not cost a second of stutter to find out. */
+      let quality = Math.min(window.devicePixelRatio || 1, window.innerWidth < 760 ? 0.85 : 1.0);
 
       renderer.setPixelRatio(quality);
       renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -539,16 +638,25 @@ export default function Cosmos() {
       const right = new THREE.Vector3(0, 1, 0).cross(fwd).normalize();
       const up = fwd.clone().cross(right);
 
+      /* The disk runs out to DISK_OUT / B_SHADOW ≈ 4.6 shadow radii, so on a
+         narrow viewport the frame decides how big the hole may be — a fixed
+         radius that reads well on a laptop has the disk hanging off both
+         sides of a phone. Size it to the half-width available instead, and
+         let the desktop figure be the ceiling rather than the rule. */
+      const DISK_SPAN = (24 / B_SHADOW) * 1.04;
+
       /** Screen radius (uv units) we want the shadow to occupy. */
-      const shadowTarget = () => (window.innerWidth < 760 ? 0.078 : 0.058);
+      const shadowTarget = () => Math.min(0.062, (aspect() * 0.5) / DISK_SPAN);
+      /** How far from centre the hole may sit before the disk clips. */
+      const holeLimit = (shadow: number) => Math.max(0, aspect() * 0.5 - shadow * DISK_SPAN);
       /** FOV scale that puts the shadow at that radius. */
       const zoomFor = (target: number) => B_SHADOW / CAM_D / target;
 
       const uniforms = {
         uRes: { value: new THREE.Vector2(1, 1) },
         uTime: { value: 0 },
-        uHole: { value: new THREE.Vector2(0.26, 0.04) },
-        uZoom: { value: zoomFor(0.058) },
+        uHole: { value: new THREE.Vector2(Math.min(aspect() * 0.27, holeLimit(shadowTarget())), 0.04) },
+        uZoom: { value: zoomFor(shadowTarget()) },
         uFeed: { value: 0 },
         uIntro: { value: 0 },
         uDim: { value: 1 },
@@ -624,7 +732,7 @@ export default function Cosmos() {
         uZoom: { value: uniforms.uZoom.value },
         uAspect: { value: 1 },
         uDpr: { value: quality },
-        uShadow: { value: 0.058 },
+        uShadow: { value: shadowTarget() },
         uDim: { value: 1 },
         uBlast: { value: 0 },
       };
@@ -676,6 +784,12 @@ export default function Cosmos() {
       };
       resize();
       window.addEventListener('resize', resize, { passive: true });
+      // iOS settles the viewport a beat after the rotation event fires
+      const onOrient = () => {
+        resize();
+        window.setTimeout(resize, 260);
+      };
+      window.addEventListener('orientationchange', onOrient, { passive: true });
 
       let visible = !document.hidden;
       const onVis = () => {
@@ -697,11 +811,11 @@ export default function Cosmos() {
 
       /* ── frame ───────────────────────────────────────────────── */
 
-      let holeX = 0.26;
+      let shadowNow = shadowTarget();
+      let holeX = Math.min(aspect() * 0.27, holeLimit(shadowNow));
       let holeY = 0.04;
       let feed = 0;
       let dim = 1;
-      let shadowNow = shadowTarget();
       /** Detonation brightness, and how far its shock front has swept. */
       let blast = 0;
       let shock = 0;
@@ -784,7 +898,11 @@ export default function Cosmos() {
         shared.uZoom.value = uniforms.uZoom.value;
         shared.uShadow.value = shadowNow;
 
-        const homeX = asp * 0.27;
+        /* Off to one side where there is room for it, dead centre where
+           there is not — on a phone the frame is barely wider than the
+           disk, so anything but centred loses a limb off the edge. */
+        const limit = holeLimit(shadowNow);
+        const homeX = Math.min(asp * 0.27, limit);
         const homeY = 0.05 - scrollState.progress * 0.16;
         let targetX = homeX;
         let targetY = homeY;
@@ -795,7 +913,7 @@ export default function Cosmos() {
         } else if (pointer.active && !reduced) {
           const pxUv = pointer.snx * 0.5 * asp;
           const pyUv = -pointer.sny * 0.5;
-          targetX = homeX + (pxUv - homeX) * 0.3;
+          targetX = clamp(homeX + (pxUv - homeX) * 0.3, -limit, limit);
           targetY = homeY + (pyUv - homeY) * 0.3;
         }
         // Heavy damping: it should feel like moving something enormous
@@ -895,6 +1013,7 @@ export default function Cosmos() {
       cleanup = () => {
         stop();
         window.removeEventListener('resize', resize);
+        window.removeEventListener('orientationchange', onOrient);
         document.removeEventListener('visibilitychange', onVis);
         canvas.removeEventListener('webglcontextlost', onLost);
         canvas.removeEventListener('webglcontextrestored', onRestored);

@@ -36,8 +36,8 @@ export default function Cursor() {
     let mode: Mode = 'idle';
     let rx = pointer.x;
     let ry = pointer.y;
-    let scale = 1;
-    let targetScale = 1;
+    let scale = 0.375;
+    let targetScale = 0.375;
     let opacity = 0;
 
     const applyMode = (next: Mode, text: string) => {
@@ -45,7 +45,11 @@ export default function Cursor() {
       mode = next;
       ring.dataset.mode = next;
       label.textContent = text;
-      targetScale = next === 'view' ? 2.9 : next === 'link' ? 1.85 : next === 'drag' ? 2.4 : 1;
+      /* Fractions of the ring's 96px layout box, so these read as the
+         diameter each state actually draws: 68 / 50 / 58 / 36 px. Nothing
+         here may reach 1 once `stretch` is folded in — see the CSS. */
+      targetScale =
+        next === 'view' ? 0.71 : next === 'link' ? 0.52 : next === 'drag' ? 0.6 : 0.375;
     };
 
     const onOver = (e: PointerEvent) => {
@@ -86,7 +90,7 @@ export default function Cursor() {
       const dx = pointer.x - rx;
       const dy = pointer.y - ry;
       const dist = Math.hypot(dx, dy);
-      const stretch = clamp(dist / 90, 0, 0.45);
+      const stretch = clamp(dist / 110, 0, 0.3);
       const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
       opacity = damp(opacity, pointer.active ? 1 : 0, 0.1, dt);

@@ -3,10 +3,10 @@
 import { collapse } from '@/lib/singularity';
 
 /**
- * The easter egg's trigger. It sits at the end of the footer colophon as a
- * small dark disc with a faint ring — legible if you are looking at it,
- * invisible if you are not. Keyboard reachable and properly labelled, so
- * nobody hits it by accident but anybody can find it.
+ * The easter egg's trigger. It used to be an unlabelled 14px disc at half
+ * opacity, which nobody found. It is now a labelled pill with a core that
+ * keeps accreting — still the quietest thing in the footer, but it reads as
+ * a control on sight instead of on the second look.
  */
 export default function CollapseTrigger() {
   return (
@@ -14,12 +14,15 @@ export default function CollapseTrigger() {
       className="collapse-trigger"
       onClick={collapse}
       aria-label="Collapse the page into the singularity"
-      title="?"
       data-cursor="view"
       data-cursor-label="Feed"
     >
-      <span className="collapse-trigger__core" aria-hidden="true" />
-      <span className="collapse-trigger__ring" aria-hidden="true" />
+      <span className="collapse-trigger__orb" aria-hidden="true">
+        <i className="collapse-trigger__core" />
+        <i className="collapse-trigger__ring" />
+        <i className="collapse-trigger__ring collapse-trigger__ring--late" />
+      </span>
+      <span className="collapse-trigger__label">feed the hole</span>
     </button>
   );
 }

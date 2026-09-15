@@ -13,6 +13,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: auto; /* Lenis owns scrolling */
+  /* Belt and braces with the body rule below: a single bleeding decoration
+     on a narrow screen must never turn into a sideways scroll. */
+  overflow-x: clip;
 }
 
 html.lenis,
